@@ -1,7 +1,7 @@
 
 # rofi-todoist
 
-A streamlined CLI tool for managing Todoist tasks using Rofi on Linux systems, ideal for productivity enthusiasts and keyboard-centric users.
+A tool for managing Todoist tasks using Rofi on Linux systems, ideal for productivity enthusiasts and keyboard-centric users.
 
 ## Features
 
