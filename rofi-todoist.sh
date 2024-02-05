@@ -16,13 +16,22 @@ function addTask(){
     exit 1
   fi
 
+   priority=1
+
+   if [[ $taskContent =~ ^p[1-4]\  ]]; then
+       priority=${taskContent:1:1}
+       taskContent=${taskContent:3}
+   fi
+
+   data="{\"content\": \"$taskContent\", \"project_id\": \"$TODOIST_PROJECT_ID\", \"priority\": $priority}"
+
 	if curl "https://api.todoist.com/rest/v2/tasks" \
-			-X POST \
-			--data "{\"content\": \"$taskContent\", \"project_id\": \"$TODOIST_PROJECT_ID\"}" \
-			-H "Content-Type: application/json" \
-			-H "X-Request-Id: $(uuidgen)" \
-			-H "Authorization: Bearer $TODOIST_API_KEY"; then
-			notify "Task successfully added." 'tasks/addtask'
+		-X POST \
+		--data "$data" \
+		-H "Content-Type: application/json" \
+		-H "X-Request-Id: $(uuidgen)" \
+		-H "Authorization: Bearer $TODOIST_API_KEY"; then
+		notify "Task successfully added." 'tasks/addtask'
 	else
 			notify "Failed to add task." 'error'
 	fi
@@ -85,9 +94,9 @@ function modifyMenu(){
         "Description")
             changeDescription $taskId
             ;;
-        # "Priority")
-        #     echo "Enter new name:"
-        #     ;;
+        "Priority")
+            changePriority $taskId
+            ;;
         # "Due Date")
         #     echo "Enter new name:"
         #    ;;
@@ -101,25 +110,36 @@ function modifyMenu(){
 }
 
 function changeName(){
-    local taskId=$1
-    local newName=$(rofi -dmenu -p "New Name")
-    curl "https://api.todoist.com/rest/v2/tasks/$taskId" \
-        -X POST \
-        --data "{\"content\": \"$newName\"}" \
-        -H "Content-Type: application/json" \
-        -H "X-Request-Id: $(uuidgen)" \
-        -H "Authorization: Bearer $TODOIST_API_KEY"
+  local taskId=$1
+  local newName=$(rofi -dmenu -p "New Name")
+  curl "https://api.todoist.com/rest/v2/tasks/$taskId" \
+    -X POST \
+    --data "{\"content\": \"$newName\"}" \
+    -H "Content-Type: application/json" \
+    -H "X-Request-Id: $(uuidgen)" \
+    -H "Authorization: Bearer $TODOIST_API_KEY"
 }
 
 function changeDescription(){
-    local taskId=$1
-    local description=$(rofi -dmenu -p "New Description")
-    curl "https://api.todoist.com/rest/v2/tasks/$taskId" \
-        -X POST \
-        --data "{\"description\": \"$description\"}" \
-        -H "Content-Type: application/json" \
-        -H "X-Request-Id: $(uuidgen)" \
-        -H "Authorization: Bearer $TODOIST_API_KEY"
+  local taskId=$1
+  local description=$(rofi -dmenu -p "New Description")
+  curl "https://api.todoist.com/rest/v2/tasks/$taskId" \
+    -X POST \
+    --data "{\"description\": \"$description\"}" \
+    -H "Content-Type: application/json" \
+    -H "X-Request-Id: $(uuidgen)" \    
+    -H "Authorization: Bearer $TODOIST_API_KEY"
+}
+
+function changePriority(){
+  local taskId=$1
+  local priority=$(rofi -dmenu -p "New Priority(1-4)")
+  curl "https://api.todoist.com/rest/v2/tasks/$taskId" \
+    -X POST \
+    --data "{\"priority\": $priority}" \
+    -H "Content-Type: application/json" \
+    -H "X-Request-Id: $(uuidgen)" \
+    -H "Authorization: Bearer $TODOIST_API_KEY"
 }
 
 function mainMenu {
