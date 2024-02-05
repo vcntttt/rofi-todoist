@@ -39,22 +39,22 @@ function viewTasks(){
     local taskId=$(echo $selectedTask | awk '{print $1}')
 
     if [ -n "$taskId" ]; then
-        taskAction "$taskId"
+        actionsMenu "$taskId"
     else
         notify "No task selected." 'error'
     fi
 }
 
-function taskAction() {
+function actionsMenu() {
     local action=$(printf "Complete\nModify\nReturn" | rofi -dmenu -p "Select an action for $taskId")
     local taskId=$1
 
     case $action in
         "Complete")
             completeTask $taskId
-            ;;
+           ;;
         "Modify")
-            echo "Modify task ID $taskId"
+            modifyMenu $taskId
             ;;
         "Return")
             mainMenu
@@ -62,7 +62,7 @@ function taskAction() {
         *)
             notify "No action selected or invalid option." 'error'
             ;;
-    esac
+    esac 
 }
 
 function completeTask(){
@@ -73,6 +73,53 @@ function completeTask(){
     else
         notify "Failed to complete task." 'error'
     fi
+}
+
+function modifyMenu(){
+    local action=$(printf "Name\nDescription\nPriority\nDue Date\nReturn" | rofi -dmenu -p "choose one")
+    local taskId=$1
+        case $action in
+        "Name")
+            changeName $taskId
+           ;;
+        "Description")
+            changeDescription $taskId
+            ;;
+        # "Priority")
+        #     echo "Enter new name:"
+        #     ;;
+        # "Due Date")
+        #     echo "Enter new name:"
+        #    ;;
+        "Return")
+            viewTasks
+       ;;
+        *)
+            notify "No action selected or invalid option." 'error'
+            ;;
+    esac 
+}
+
+function changeName(){
+    local taskId=$1
+    local newName=$(rofi -dmenu -p "New Name")
+    curl "https://api.todoist.com/rest/v2/tasks/$taskId" \
+        -X POST \
+        --data "{\"content\": \"$newName\"}" \
+        -H "Content-Type: application/json" \
+        -H "X-Request-Id: $(uuidgen)" \
+        -H "Authorization: Bearer $TODOIST_API_KEY"
+}
+
+function changeDescription(){
+    local taskId=$1
+    local description=$(rofi -dmenu -p "New Description")
+    curl "https://api.todoist.com/rest/v2/tasks/$taskId" \
+        -X POST \
+        --data "{\"description\": \"$description\"}" \
+        -H "Content-Type: application/json" \
+        -H "X-Request-Id: $(uuidgen)" \
+        -H "Authorization: Bearer $TODOIST_API_KEY"
 }
 
 function mainMenu {
