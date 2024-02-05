@@ -92,7 +92,7 @@ function modifyMenu(){
         #     echo "Enter new name:"
         #    ;;
         "Return")
-            viewTasks
+            mainMenu
        ;;
         *)
             notify "No action selected or invalid option." 'error'
