@@ -13,11 +13,11 @@ When adding tasks, you can assign properties such as priority or due dates.
 
 - To asign a due date....
 
-### Completar Tareas
+### Completing Tareas
 
 Simply select the task you wish you to complete.
 
-### Modificar Tareas
+### Modifying Tareas
 
 You can update 4 key properties of a task:
 
